@@ -21,7 +21,7 @@ class CreateAccount(BaseView):
 
 class Login(BaseView):
     def post(self):
-        params = self.request.form
+        params = self.request.json
         username = params.get("username", None)
         password = params.get("password", None)
 
