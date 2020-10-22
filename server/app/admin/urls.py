@@ -2,7 +2,7 @@
 # @Time    : 2020/10/18 9:34 上午
 # @Author  : xu.junpeng
 
-from app.admin.views import Ping, CreateAccount, Login
+from app.admin.views import Ping, CreateAccount, Login, userInfo
 
 
 def bind_urls(app):
@@ -11,3 +11,7 @@ def bind_urls(app):
         '/user/create', view_func=CreateAccount.as_view('create_account'), methods=['POST'])
     app.add_url_rule(
         '/user/login', view_func=Login.as_view('login'), methods=['POST'])
+    app.add_url_rule(
+        '/user/info', view_func=userInfo.as_view('get_user_info'), methods=['GET'])
+    app.add_url_rule(
+        '/user/logout', view_func=userInfo.as_view('log_out'), methods=['POST'])
