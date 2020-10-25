@@ -3,3 +3,4 @@
 # @Author  : xu.junpeng
 
 from .user import UserController
+from .spider import TiebaController

@@ -3,3 +3,4 @@
 # @Author  : xu.junpeng
 
 from .user import User
+from .spider import Tieba

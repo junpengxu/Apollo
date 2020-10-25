@@ -41,5 +41,5 @@ class userInfo(BaseView):
             "roles": ['admins'],
             "introduction": "this is introduction",
             "name": "weakee",
-            "avatar": "avatar",
+            "avatar": "https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif",
         })

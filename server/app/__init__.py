@@ -13,11 +13,10 @@ app.config.from_object("config")
 
 db.init_app(app)
 
-
 bind_urls(app)
 
 # if you want create database table;
-# you should run `flask shell` in terminal, and then do this
+# you should run `flask shell` in terminal at Apollo, and then do this
 # 1. from app.admin.models import *
 # 2. from app import db
 # 3. db.create_all()
