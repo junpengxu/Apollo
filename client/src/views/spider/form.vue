@@ -1,7 +1,10 @@
 <template>
   <div class="form">
     <el-form ref="form" :model="form" :rules="rules" label-width="120px">
-      <el-form-item prop="url" label="贴吧链接">
+      <el-form-item prop="desc" label="任务描述">
+        <el-input v-model="form.desc" />
+      </el-form-item>
+      、      <el-form-item prop="url" label="贴吧链接">
         <el-input v-model="form.url" />
       </el-form-item>
       <el-form-item prop="headers" label="请求头信息">
@@ -27,7 +30,7 @@
   </div>
 </template>
 <script>
-import { zongyue } from '@/api/tieba-spider'
+import { createSpiderTask } from '@/api/spider'
 
 export default {
   data() {
@@ -36,7 +39,8 @@ export default {
         url: '',
         headers: '',
         start_page: '',
-        end_page: ''
+        end_page: '',
+        desc: ''
       },
       rules: {
         start_page: [
@@ -57,12 +61,19 @@ export default {
         if (valid) {
           const params = {
             'url': this.form.url,
+            'desc': this.form.desc,
             'headers': this.form.headers,
             'start_page': this.form.start_page,
             'end_page': this.form.end_page
           }
-          zongyue(params).then(response => {
-            console.log(response)
+          createSpiderTask(params).then(response => {
+            const h = this.$createElement
+            this.$notify({
+              title: '任务创建成功',
+              message: h('i', { style: 'color: teal' }, '爬虫任务创建成功'),
+              duration: 8000
+            })
+            this.$router.push({ path: '/spider/list', query: {}})
           }).catch(err => {
             console.log(err)
           })

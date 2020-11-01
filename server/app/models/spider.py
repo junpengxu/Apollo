@@ -6,10 +6,11 @@
 from app.base.basemodel import BaseModel, db
 
 
-class Tieba(db.Model, BaseModel):
-    __tablename__ = 'tieba_spider'
+class Spider(db.Model, BaseModel):
+    __tablename__ = 'spider'
     id = db.Column(db.Integer, primary_key=True)
-    request_url = db.Column(db.String(64), unique=True)
+    desc = db.Column(db.String(2048))
+    request_url = db.Column(db.String(256))
     request_headers = db.Column(db.Text)
     start_page = db.Column(db.Integer)
     end_page = db.Column(db.Integer)

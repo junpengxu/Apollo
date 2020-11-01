@@ -3,7 +3,7 @@
 # @Author  : xu.junpeng
 
 from app.admin.views import Ping, CreateAccount, Login, userInfo, Logout
-from app.admin.views import ZongYue as ZongYueSpider
+from app.admin.views import CreateSpiderTask, SearchSpiderTask
 
 
 def bind_urls(app):
@@ -23,4 +23,6 @@ def bind_urls(app):
     # spider
     ##########
     app.add_url_rule(
-        '/spider/zongyue', view_func=ZongYueSpider.as_view('zongyue_tieba_spider'), methods=['POST'])
+        '/spider/create_task', view_func=CreateSpiderTask.as_view('create_spider_task'), methods=['POST'])
+    app.add_url_rule(
+        '/spider/search_task', view_func=SearchSpiderTask.as_view('search_spider_task'), methods=['POST'])

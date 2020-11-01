@@ -1,1 +1,0 @@
-flask-sqlalchemy==2.4.4
