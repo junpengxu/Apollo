@@ -6,7 +6,7 @@
 from app.base.baseview import BaseView
 from app.base.status_code import Codes
 
-from app.admin.controllers import SpiderController
+from app.controllers import SpiderController
 
 
 class CreateSpiderTask(BaseView):
@@ -29,10 +29,26 @@ class SearchSpiderTask(BaseView):
         offset = int(params.get("offset", 20))
         content = params.get("content")
         query = params.get("query", {})
-        res = SpiderController.search_task(page, offset, content, **query)
-        if len(res) == 0:
+        result, total_nums = SpiderController.search_task(page, offset, content, **query).values()
+        if len(result) == 0:
             return self.formattingData(code=Codes.FAILE.code, msg='未查询到数据', data=None)
-        for index, item in enumerate(res):
-            res[index]["url"] = item["request_url"]
-            del res[index]["request_url"]
-        return self.formattingData(code=Codes.SUCCESS.code, msg='搜索完成', data={"data": res, "total_nums": len(res)})
+        for index, item in enumerate(result):
+            result[index]["url"] = item["request_url"]
+            del result[index]["request_url"]
+        return self.formattingData(code=Codes.SUCCESS.code, msg='搜索完成', data={"data": result, "total_nums": total_nums})
+
+
+class getSpiderTaskResult(BaseView):
+    def post(self):
+        params = self.request.json
+        page = int(params.get("page", 1))
+        offset = int(params.get("offset", 20))
+        content = params.get("content")
+        query = params.get("query", {})
+        result, total_nums = SpiderController.search_task(page, offset, content, **query).values()
+        if len(result) == 0:
+            return self.formattingData(code=Codes.FAILE.code, msg='未查询到数据', data=None)
+        for index, item in enumerate(result):
+            result[index]["url"] = item["request_url"]
+            del result[index]["request_url"]
+        return self.formattingData(code=Codes.SUCCESS.code, msg='搜索完成', data={"data": result, "total_nums": total_nums})

@@ -2,8 +2,8 @@
 # @Time    : 2020/10/18 9:34 上午
 # @Author  : xu.junpeng
 
-from app.admin.views import Ping, CreateAccount, Login, userInfo, Logout
-from app.admin.views import CreateSpiderTask, SearchSpiderTask
+from app.views import Ping, CreateAccount, Login, userInfo, Logout
+from app.views import CreateSpiderTask, SearchSpiderTask, getSpiderTaskResult
 
 
 def bind_urls(app):
@@ -26,3 +26,5 @@ def bind_urls(app):
         '/spider/create_task', view_func=CreateSpiderTask.as_view('create_spider_task'), methods=['POST'])
     app.add_url_rule(
         '/spider/search_task', view_func=SearchSpiderTask.as_view('search_spider_task'), methods=['POST'])
+    app.add_url_rule(
+        '/spider/get_result', view_func=getSpiderTaskResult.as_view('get_spider_task_result'), methods=['POST'])

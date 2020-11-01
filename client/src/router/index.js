@@ -7,10 +7,10 @@ Vue.use(Router)
 import Layout from '@/layout'
 
 /* Router Modules */
-import componentsRouter from './modules/components'
-import chartsRouter from './modules/charts'
-import tableRouter from './modules/table'
-import nestedRouter from './modules/nested'
+// import componentsRouter from './modules/components'
+// import chartsRouter from './modules/charts'
+// import tableRouter from './modules/table'
+// import nestedRouter from './modules/nested'
 
 /**
  * Note: sub-menu only appear when route children.length >= 1
@@ -53,11 +53,6 @@ export const constantRoutes = [
   {
     path: '/login',
     component: () => import('@/views/login/index'),
-    hidden: true
-  },
-  {
-    path: '/auth-redirect',
-    component: () => import('@/views/login/auth-redirect'),
     hidden: true
   },
   {
@@ -389,14 +384,26 @@ export const constantRoutes = [
 
 export const asyncRoutes = [
   {
-    path: '/error-log',
+    redirect: '/spider/list',
+    path: '/spider/list',
     component: Layout,
+    name: '爬虫',
+    meta: {
+      title: '爬虫',
+      icon: 'el-icon-s-help'
+    },
     children: [
       {
-        path: 'log',
-        component: () => import('@/views/spider/tieba/zongyue/form'),
-        name: '纵月爬虫',
-        meta: { title: '纵月贴吧爬虫', icon: 'documentation' }
+        path: 'form',
+        component: () => import('@/views/spider/form'),
+        name: '爬虫任务页面',
+        meta: { title: '爬虫任务创建', icon: 'documentation' }
+      },
+      {
+        path: 'zongyue/list',
+        component: () => import('@/views/spider/list'),
+        name: '爬虫任务列表',
+        meta: { title: '纵月爬虫任务列表', icon: 'documentation' }
       }
     ]
   }

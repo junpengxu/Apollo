@@ -2,7 +2,6 @@
   <div class="app-container">
     <el-table
       :data="tableData"
-      border
     >
       <el-table-column
         prop="id"
@@ -24,12 +23,11 @@
         width="100"
       >
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="handleClick(scope.row)">查看</el-button>
-          <el-button type="text" size="small">编辑</el-button>
+          <el-button type="text" size="small" @click="handleClick(scope.row)">查看结果</el-button>
         </template>
       </el-table-column>
     </el-table>
-    <div class="block">
+    <div class="block" style="float: right">
       <el-pagination
         :current-page="this.page"
         :page-sizes="[10, 50, 100, 200]"
@@ -50,7 +48,7 @@ export default {
   data() {
     return {
       page: 1,
-      offset: 100,
+      offset: 10,
       totalNum: 1000,
       tableData: []
     }
@@ -72,6 +70,7 @@ export default {
           duration: 1000
         })
         this.tableData = response.data.data
+        this.totalNum = response.data['total_nums']
       }).catch(err => {
         console.log(err)
       })

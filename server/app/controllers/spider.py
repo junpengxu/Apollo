@@ -2,7 +2,7 @@
 # @Time    : 2020/10/25 5:20 下午
 # @Author  : xu.junpeng
 
-from ...models import Spider
+from app.models import Spider
 from sqlalchemy import and_
 
 
