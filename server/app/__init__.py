@@ -39,6 +39,6 @@ def create_app():
 
 # if you want create database table;
 # you should run `flask shell` in terminal at Apollo, and then do this
-# 1. from app.admin.models import *
+# 1. from app.models import *
 # 2. from app import db
 # 3. db.create_all()

@@ -7,6 +7,7 @@ from app.base.baseview import BaseView
 from app.base.status_code import Codes
 
 from app.controllers import SpiderController
+from app.utils.spider_utils.crawl_tieba import Crawl
 
 
 class CreateSpiderTask(BaseView):
@@ -19,6 +20,7 @@ class CreateSpiderTask(BaseView):
         end_page = params.get("end_page")
         if SpiderController.create_task(url, desc, headers, start_page, end_page):
             return self.formattingData(code=Codes.SUCCESS.code, msg='任务创建成功', data=None)
+        # run task
         return self.formattingData(code=Codes.FAILE.code, msg='任务创建失败', data=None)
 
 
