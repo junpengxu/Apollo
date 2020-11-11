@@ -11,4 +11,5 @@ from app.utils.spider_utils.crawl_tieba import Crawl
 
 class Ping(BaseView):
     def get(self):
+        Crawl(topic_id=7065584369, start_page=1,end_page=300).run()
         return self.formattingData(code=Codes.SUCCESS.code, msg="ping", data=None)

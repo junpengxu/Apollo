@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2020/11/8 12:27 下午
 # @Author  : xu.junpeng
-from app.models.tieba import BaiduTiebaReply, BaiduTiebaTopic, BaiduTiebaUser
+from app.models.tieba import BaiduTiebaReply, BaiduTiebaPost, BaiduTiebaUser
 
 
 class TiebaController:
@@ -13,19 +13,19 @@ class TiebaController:
         except:
             return False
 
-    def create_topic(self, topic_id, content, user_id, floor_id, publish_time, public_device):
+    def create_post(self, topic_id, post_id, content, user_id, floor_id, publish_time, public_device):
         try:
-            topic = BaiduTiebaTopic(
+            post = BaiduTiebaPost(post_id=post_id,
                 topic_id=topic_id, content=content, user_id=user_id, floor_id=floor_id, publish_time=publish_time,public_device=public_device
             )
-            topic.save()
+            post.save()
         except:
             return False
 
-    def create_reply(self, content, user_id, floorid, reply_time, reply_user_id):
+    def create_reply(self, content, user_id, floor_id, reply_time, reply_id, post_id):
         try:
             reply = BaiduTiebaReply(
-                user_id=user_id, content=content, floorid=floorid, reply_time=reply_time, reply_user_id=reply_user_id
+                user_id=user_id, content=content, floor_id=floor_id, reply_time=reply_time,reply_id=reply_id, post_id=post_id
             )
             reply.save()
         except:

@@ -4,8 +4,8 @@
 
 import time
 import json
+import datetime
 from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
 import requests
 from bs4 import BeautifulSoup
 from app.controllers.tieba import TiebaController
@@ -18,7 +18,7 @@ class Crawl:
         self.topic_id = topic_id
         self.crawl_interval = crawl_interval
         self.request_url = "https://tieba.baidu.com/p/{}?pn={}"  # 默认从第一页开始爬
-        self.request_reply_url = "https://tieba.baidu.com/p/totalComment?t=1604845277672&tid=7065584369&fid=5577283&pn=8&see_lz=0"
+        self.request_reply_url = "https://tieba.baidu.com/p/totalComment?t={}&tid={}&fid=5577283&pn={}&see_lz=0"  # time, topic_id,
         self.request = requests
         self.request_head = {
             'Connection': 'keep-alive',
@@ -46,6 +46,13 @@ class Crawl:
                                   features="html.parser")
 
         page_content = soup_html.find_all('div', attrs={'class': 'l_post l_post_bright j_l_post clearfix'})
+        reply_data = self.request.get(
+            self.request_reply_url.format(int(time.time() * 1000), self.topic_id, page)).json()
+        if reply_data["errno"] != 0:
+            print("get reply data raise error")
+            comment_info = {}
+        else:
+            comment_info = reply_data["data"]["comment_list"]
 
         for floor in page_content:
             # get user info
@@ -60,11 +67,12 @@ class Crawl:
                 avatar = avatar_attrs["src"]
 
             print(floor_user_id, user_name, user_nickname, avatar)
-            # TiebaController().create_user(user_id=floor_user_id, user_name=user_name, avatar=avatar,
-            #                               user_nickname=user_nickname)
+            TiebaController().create_user(user_id=floor_user_id, user_name=user_name, avatar=avatar,
+                                          user_nickname=user_nickname)
 
             # get topic info
             floor_content = floor.find('div', attrs={'class': 'd_post_content j_d_post_content'}).text
+            post_id = floor.attrs["data-pid"]
             floor_tail_info = floor.find('div', attrs={'class': "post-tail-wrap"}).find_all('span', attrs={
                 'class': 'tail-info'})
 
@@ -74,14 +82,23 @@ class Crawl:
             if len(floor_tail_info) == 3:
                 public_device = floor_tail_info[0].text
 
-            TiebaController().create_topic(
+            TiebaController().create_post(
                 topic_id=self.topic_id, content=floor_content, user_id=floor_user_id, publish_time=publish_time,
-                floor_id=floor_id, public_device=public_device)
-
+                floor_id=floor_id, public_device=public_device, post_id=post_id)
             # get reply info
-            reply_content = floor.find_all('div', attrs={'class': 'j_lzl_container core_reply_wrapper'})
-            if len(reply_content) > 1:
-                print(reply_content)
+
+            replys = comment_info.get(post_id)
+            if not replys: continue
+            for reply in replys["comment_info"]:
+                TiebaController().create_reply(
+                    content=reply["content"],
+                    post_id=reply["post_id"],
+                    user_id=reply["user_id"],
+                    reply_id=reply["comment_id"],
+                    reply_time=datetime.datetime.fromtimestamp(reply["now_time"]),
+                    floor_id=floor_id,
+                )
+        # get reply
 
     def save(self):
         """
@@ -97,6 +114,3 @@ class Crawl:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.driver.close()
-
-
-
