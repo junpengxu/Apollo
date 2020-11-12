@@ -11,3 +11,5 @@ class Codes(EnumBase):
     SUCCESS = (20000, '操作成功')
     FAILE = (20001, '操作失败')
     LOGOUT = (20002, '退出登陆成功')
+
+

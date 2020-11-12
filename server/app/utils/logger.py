@@ -32,4 +32,5 @@ class BaseLogger(object):
         self.logger.addHandler(th)
 
 
-base_log = BaseLogger('base.log')
+base_log = BaseLogger('base.log').logger
+spider_log = BaseLogger('spider.log').logger

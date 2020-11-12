@@ -44,7 +44,11 @@ class Crawl:
         soup_html = BeautifulSoup(self.request.get(
             url=self.request_url.format(self.topic_id, page), headers=self.request_head).content,
                                   features="html.parser")
-
+        total_page = \
+        soup_html.find('ul', attrs={'class': 'l_posts_num'}).find_all('li', attrs={'class': 'l_reply_num'})[0].find_all(
+            'span')[1].text
+        if page > int(total_page):
+            return
         page_content = soup_html.find_all('div', attrs={'class': 'l_post l_post_bright j_l_post clearfix'})
         reply_data = self.request.get(
             self.request_reply_url.format(int(time.time() * 1000), self.topic_id, page)).json()

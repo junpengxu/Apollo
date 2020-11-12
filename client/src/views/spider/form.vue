@@ -4,11 +4,8 @@
       <el-form-item prop="desc" label="任务描述">
         <el-input v-model="form.desc" />
       </el-form-item>
-      、      <el-form-item prop="url" label="贴吧链接">
-        <el-input v-model="form.url" />
-      </el-form-item>
-      <el-form-item prop="headers" label="请求头信息">
-        <el-input v-model="form.headers" type="textarea" :rows="10" />
+      <el-form-item prop="topic_id" label="贴吧帖子id">
+        <el-input v-model.number="form.topic_id" autocomplete="off" />
       </el-form-item>
       <el-form-item
         label="开始页码"
@@ -36,13 +33,16 @@ export default {
   data() {
     return {
       form: {
-        url: '',
-        headers: '',
+        topic_id: '',
         start_page: '',
         end_page: '',
         desc: ''
       },
       rules: {
+        topic_id: [
+          { required: true, message: '帖子id不能为空' },
+          { type: 'number', message: '帖子id必须为数字值' }
+        ],
         start_page: [
           { required: true, message: '结束页码不能为空' },
           { type: 'number', message: '页码必须为数字值' }
@@ -60,9 +60,8 @@ export default {
       this.$refs[form].validate((valid) => {
         if (valid) {
           const params = {
-            'url': this.form.url,
+            'topic_id': this.form.topic_id,
             'desc': this.form.desc,
-            'headers': this.form.headers,
             'start_page': this.form.start_page,
             'end_page': this.form.end_page
           }

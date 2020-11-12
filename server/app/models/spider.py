@@ -10,7 +10,6 @@ class Spider(db.Model, BaseModel):
     __tablename__ = 'spider'
     id = db.Column(db.Integer, primary_key=True)
     desc = db.Column(db.String(2048))
-    request_url = db.Column(db.String(256))
-    request_headers = db.Column(db.Text)
+    topic_id = db.Column(db.BigInteger)
     start_page = db.Column(db.Integer)
     end_page = db.Column(db.Integer)

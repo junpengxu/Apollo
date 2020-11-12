@@ -14,8 +14,14 @@
         width="400"
       />
       <el-table-column
-        prop="url"
-        label="爬虫链接"
+        prop="topic_id"
+        label="帖子id"
+      />      <el-table-column
+        prop="start_page"
+        label="开始页码"
+      />      <el-table-column
+        prop="end_page"
+        label="结束页码"
       />
       <el-table-column
         fixed="right"

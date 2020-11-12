@@ -9,14 +9,13 @@ from sqlalchemy import and_
 class SpiderController:
 
     @classmethod
-    def create_task(cls, url, desc, headers, start_page, end_page):
+    def create_task(cls, topic_id, desc, start_page, end_page):
         try:
             task = Spider(
-                request_url=url,
+                topic_id=topic_id,
                 desc=desc,
-                request_headers=headers,
                 start_page=start_page,
-                end_page=end_page
+                end_page=end_page,
             )
             task.save()
             return True
@@ -42,8 +41,7 @@ class SpiderController:
             result.append({
                 "id": task.id,
                 "desc": task.desc,
-                "request_url": task.request_url,
-                "request_headers": task.request_headers,
+                "topic_id": task.topic_id,
                 "start_page": task.start_page,
                 "end_page": task.start_page
             })
