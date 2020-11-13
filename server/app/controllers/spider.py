@@ -43,7 +43,7 @@ class SpiderController:
                 "desc": task.desc,
                 "topic_id": task.topic_id,
                 "start_page": task.start_page,
-                "end_page": task.start_page
+                "end_page": task.end_page
             })
         return {"result": result, "total_nums": total_nums}
 

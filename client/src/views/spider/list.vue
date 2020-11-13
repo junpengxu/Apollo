@@ -19,7 +19,8 @@
       />      <el-table-column
         prop="start_page"
         label="开始页码"
-      />      <el-table-column
+      />
+      <el-table-column
         prop="end_page"
         label="结束页码"
       />

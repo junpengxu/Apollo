@@ -36,5 +36,5 @@ class BaiduTiebaUser(db.Model, BaseModel):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, comment="用户id", unique=True)
     user_name = db.Column(db.String(64), comment="用户名称")
-    user_nickname = db.Column(db.String(64), comment="用户昵称")
+    nickname = db.Column(db.String(64), comment="用户昵称")
     avatar = db.Column(db.String(256), comment="用户头像")

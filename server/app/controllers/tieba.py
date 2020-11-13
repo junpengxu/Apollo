@@ -6,14 +6,16 @@ from app.models.tieba import BaiduTiebaReply, BaiduTiebaPost, BaiduTiebaUser
 
 class TiebaController:
 
-    def create_user(self, user_id, user_name, avatar, user_nickname):
+    @classmethod
+    def create_user(cls, user_id, user_name, avatar, nickname):
         try:
-            user = BaiduTiebaUser(user_id=user_id, user_name=user_name, avatar=avatar, user_nickname=user_nickname)
+            user = BaiduTiebaUser(user_id=user_id, user_name=user_name, avatar=avatar, nickname=nickname)
             user.save()
         except:
             return False
 
-    def create_post(self, topic_id, post_id, content, user_id, floor_id, publish_time, public_device):
+    @classmethod
+    def create_post(cls, topic_id, post_id, content, user_id, floor_id, publish_time, public_device):
         try:
             post = BaiduTiebaPost(post_id=post_id,
                 topic_id=topic_id, content=content, user_id=user_id, floor_id=floor_id, publish_time=publish_time,public_device=public_device
@@ -22,7 +24,8 @@ class TiebaController:
         except:
             return False
 
-    def create_reply(self, content, user_id, floor_id, reply_time, reply_id, post_id):
+    @classmethod
+    def create_reply(cls, content, user_id, floor_id, reply_time, reply_id, post_id):
         try:
             reply = BaiduTiebaReply(
                 user_id=user_id, content=content, floor_id=floor_id, reply_time=reply_time,reply_id=reply_id, post_id=post_id

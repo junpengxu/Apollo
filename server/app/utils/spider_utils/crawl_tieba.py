@@ -10,8 +10,6 @@ import requests
 from bs4 import BeautifulSoup
 from app.controllers.tieba import TiebaController
 
-driver = webdriver.Chrome()
-
 
 class Crawl:
     def __init__(self, topic_id, start_page, end_page, crawl_interval=0.02):
@@ -62,27 +60,31 @@ class Crawl:
             # 获取这一层的用户信息
             floor_user_info = self.extract_user_info(floor)
             floor_user_id = floor_user_info["user_id"]
-            TiebaController().create_user(user_id=floor_user_id, user_name=floor_user_info["user_name"],
-                                          avatar=floor_user_info["avatar"],
-                                          user_nickname=floor_user_info["user_nickname"])
+
+            self.save_user(
+                user_id=floor_user_id,
+                user_name=floor_user_info["user_name"],
+                avatar=floor_user_info["avatar"],
+                nickname=floor_user_info["user_nickname"]
+            )
+
             # 获取post(层)的信息
             post_info = self.extract_post(floor)
-            TiebaController().create_post(
-                topic_id=self.topic_id, content=post_info["content"], user_id=floor_user_id,
-                publish_time=post_info["publish_time"],
-                floor_id=post_info["floor_id"], public_device=post_info["public_device"], post_id=post_info["post_id"])
+            self.save_post(
+                topic_id=self.topic_id, content=post_info["content"],
+                user_id=floor_user_id, publish_time=post_info["publish_time"],
+                floor_id=post_info["floor_id"], public_device=post_info["public_device"],
+                post_id=post_info["post_id"]
+            )
 
             # get reply info
             replys = comment_info.get(post_info["post_id"])
             if not replys: continue
             for reply in replys["comment_info"]:
-                TiebaController().create_reply(
-                    content=reply["content"],
-                    post_id=reply["post_id"],
-                    user_id=reply["user_id"],
+                self.save_reply(
+                    content=reply["content"], post_id=reply["post_id"], user_id=reply["user_id"],
                     reply_id=reply["comment_id"],
-                    reply_time=datetime.datetime.fromtimestamp(reply["now_time"]),
-                    floor_id=post_info["floor_id"],
+                    reply_time=datetime.datetime.fromtimestamp(reply["now_time"]), floor_id=post_info["floor_id"]
                 )
 
     def extract_user_info(self, floor):
@@ -138,12 +140,30 @@ class Crawl:
                    .find_all('li', attrs={'class': 'l_reply_num'})[0]
                    .find_all('span')[1].text)
 
-    def save(self):
-        """
-        按层保存，保存层主信息， 楼层内容， 回复内容
-        :return:
-        """
-        pass
+    def save_user(self, user_id, user_name, avatar, nickname):
+        TiebaController.create_user(
+            user_id=user_id,
+            user_name=user_name,
+            avatar=avatar,
+            nickname=nickname
+        )
+
+    def save_post(self, topic_id, content, user_id, publish_time, floor_id, public_device, post_id):
+        TiebaController.create_post(
+            topic_id=topic_id, content=content, user_id=user_id,
+            publish_time=publish_time, floor_id=floor_id, post_id=post_id,
+            public_device=public_device
+        )
+
+    def save_reply(self, content, post_id, user_id, reply_id, reply_time, floor_id):
+        TiebaController.create_reply(
+            content=content,
+            post_id=post_id,
+            user_id=user_id,
+            reply_id=reply_id,
+            reply_time=reply_time,
+            floor_id=floor_id,
+        )
 
     def run(self):
         for page in range(self.start_page, self.end_page):
