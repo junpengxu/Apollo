@@ -12,8 +12,9 @@ from app.controllers.tieba import TiebaController
 
 
 class Crawl:
-    def __init__(self, topic_id, start_page, end_page, crawl_interval=0.02):
+    def __init__(self, topic_id, crawl_interval=0.02):
         self.topic_id = topic_id
+        self.topic_title = None
         self.crawl_interval = crawl_interval
         self.request_url = "https://tieba.baidu.com/p/{}?pn={}"  # 默认从第一页开始爬
         self.request_reply_url = "https://tieba.baidu.com/p/totalComment?t={}&tid={}&fid=5577283&pn={}&see_lz=0"  # time, topic_id,
@@ -25,35 +26,32 @@ class Crawl:
             'X-Requested-With': 'XMLHttpRequest',
             'Accept-Language': 'zh-CN,zh;q=0.9'
         }
-        self.start_page = start_page
-        self.end_page = end_page
         self.soup_html = None
         self.driver = webdriver.Chrome()
         self.driver.get(self.request_url.format(self.topic_id, 1))
         self.request_cookies = None
         self.__gene_request_cookies()
         self.driver.close()
+        self.now_page = 1
+        self.topic_total_page_nums = 0
 
     def __gene_request_cookies(self):
         cookies = [item["name"] + "=" + item["value"] for item in self.driver.get_cookies()]
         cookies = '; '.join(item for item in cookies)
         self.request_head.update({"Cookie": cookies})
 
-    def process_webpage(self, now_page):
+    def process_webpage(self):
 
         # 1. 获取到当前页面
         soup_html = BeautifulSoup(self.request.get(
-            url=self.request_url.format(self.topic_id, now_page), headers=self.request_head).content,
+            url=self.request_url.format(self.topic_id, self.now_page), headers=self.request_head).content,
                                   features="html.parser")
-        # 2. 拿到总页面数量
-        total_page = self.get_topic_total_post_nums(soup_html)
-        if now_page > int(total_page): return
 
         # 3. 提取出帖子相关的楼层信息，包括这个帖子在当前页面的发布信息，以及回复，以及用户的简要信息
         page_content = soup_html.find_all('div', attrs={'class': 'l_post l_post_bright j_l_post clearfix'})
 
         # 4. 通过回复接口拿到这个页面下所有的回复信息
-        comment_info = self.extract_reply(now_page=now_page)
+        comment_info = self.extract_reply(now_page=self.now_page)
 
         # 5. 遍历当前页面下每一个post
         for floor in page_content:
@@ -135,10 +133,17 @@ class Crawl:
             comment_info = reply_data["data"]["comment_list"]
         return comment_info
 
-    def get_topic_total_post_nums(self, soup_html):
-        return int(soup_html.find('ul', attrs={'class': 'l_posts_num'})
-                   .find_all('li', attrs={'class': 'l_reply_num'})[0]
-                   .find_all('span')[1].text)
+    def get_topic_info(self):
+        soup_html = BeautifulSoup(self.request.get(
+            url=self.request_url.format(self.topic_id, self.now_page), headers=self.request_head).content,
+                                  features="html.parser")
+        topic_title = soup_html.find('h3', attrs='core_title_txt pull-left text-overflow').text
+        topic_total_page_nums = int(soup_html.find('ul', attrs={'class': 'l_posts_num'})
+                                    .find_all('li', attrs={'class': 'l_reply_num'})[0]
+                                    .find_all('span')[1].text)
+
+        self.topic_title = topic_title
+        self.topic_total_page_nums = topic_total_page_nums
 
     def save_user(self, user_id, user_name, avatar, nickname):
         TiebaController.create_user(
@@ -165,10 +170,21 @@ class Crawl:
             floor_id=floor_id,
         )
 
+    def save_crawl_topic_status(self):
+        url = self.request_url.format(self.topic_id, self.now_page)
+        TiebaController.create_topic(topic_id=self.topic_id, title=self.topic_title, crawl_page=self.now_page, url=url)
+
+    def update_topic_crawl_status(self):
+        TiebaController.update_topic_crawl_status(topic_id=self.topic_id, crawl_page=self.now_page)
+
     def run(self):
-        for page in range(self.start_page, self.end_page):
+        self.get_topic_info()
+        self.save_crawl_topic_status()
+        while self.now_page <= self.topic_total_page_nums:
+            self.process_webpage()
+            self.update_topic_crawl_status()
+            self.now_page += 1
             time.sleep(self.crawl_interval)  # 避免爬的速度过快产生其他问题
-            self.process_webpage(page)
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.driver.close()

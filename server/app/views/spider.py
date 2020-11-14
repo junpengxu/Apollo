@@ -15,10 +15,8 @@ class CreateSpiderTask(BaseView):
         params = self.request.json
         topic_id = params.get("topic_id")
         desc = params.get("desc")
-        start_page = params.get("start_page")
-        end_page = params.get("end_page")
-        run_zongyue_tieba_spider.delay(topic_id=topic_id, start_page=start_page, end_page=end_page)
-        if SpiderController.create_task(topic_id, desc, start_page, end_page):
+        run_zongyue_tieba_spider.delay(topic_id=topic_id)
+        if SpiderController.create_task(topic_id, desc):
             return self.formattingData(code=Codes.SUCCESS.code, msg='任务创建成功', data=None)
         return self.formattingData(code=Codes.FAILE.code, msg='任务创建失败', data=None)
 

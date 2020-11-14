@@ -9,13 +9,11 @@ from sqlalchemy import and_
 class SpiderController:
 
     @classmethod
-    def create_task(cls, topic_id, desc, start_page, end_page):
+    def create_task(cls, topic_id, desc):
         try:
             task = Spider(
                 topic_id=topic_id,
                 desc=desc,
-                start_page=start_page,
-                end_page=end_page,
             )
             task.save()
             return True

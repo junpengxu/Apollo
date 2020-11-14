@@ -10,7 +10,7 @@ class BaiduTiebaPost(db.Model, BaseModel):
 
     id = db.Column(db.BIGINT, primary_key=True)
     topic_id = db.Column(db.BIGINT, index=True)
-    post_id = db.Column(db.BIGINT, index=True)
+    post_id = db.Column(db.BIGINT, unique=True)
     content = db.Column(db.String(4096), comment="发布内容")
     public_device = db.Column(db.String(64), comment="发布使用的设备")
     user_id = db.Column(db.Integer, comment="用户id")
@@ -22,12 +22,23 @@ class BaiduTiebaReply(db.Model, BaseModel):
     __tablename__ = 'baidu_tieba_reply'
 
     id = db.Column(db.Integer, primary_key=True)
-    reply_id = db.Column(db.BIGINT, comment="回复id")
+    reply_id = db.Column(db.BIGINT, comment="回复id", unique=True)
     content = db.Column(db.String(4096), comment="回复内容")
     user_id = db.Column(db.Integer, comment="用户id")
     floor_id = db.Column(db.Integer, comment="回复的楼层id")
     reply_time = db.Column(db.DateTime, comment="创建时间")
     post_id = db.Column(db.BIGINT, comment="帖子id")
+
+
+class BaiduTiebaTopic(db.Model, BaseModel):
+    __tablename__ = 'baidu_tieba_topic'
+
+    id = db.Column(db.Integer, primary_key=True)
+    topic_id = db.Column(db.BIGINT, comment="帖子id", unique=True)
+    title = db.Column(db.String(4096), comment="帖子title")
+    url = db.Column(db.String(256), comment="帖子链接")
+    user_id = db.Column(db.Integer, comment="用户id")
+    crawl_page = db.Column(db.Integer, comment="爬取到的最新页码")
 
 
 class BaiduTiebaUser(db.Model, BaseModel):

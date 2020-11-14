@@ -8,8 +8,7 @@ from app.utils.spider_utils.crawl_tieba import Crawl
 
 
 @celery.task
-def run_zongyue_tieba_spider(topic_id, start_page, end_page):
-    spider_log.info("start crawl tieba topic:{}, start page:{}, end_page:{}".format(topic_id, start_page, end_page))
-    spider = Crawl(topic_id, start_page, end_page)
-    spider.run()
-    spider_log.info("finish crawl tieba topic:{}, start page:{}, end_page:{}".format(topic_id, start_page, end_page))
+def run_zongyue_tieba_spider(topic_id):
+    spider_log.info("start crawl tieba topic:{}".format(topic_id))
+    Crawl(topic_id).run()
+    spider_log.info("finish crawl tieba topic:{}".format(topic_id))
