@@ -52,3 +52,40 @@ class TiebaController:
             topic.save()
         except:
             return False
+
+    @classmethod
+    def get_posts_by_topic_id(cls, topic_id, page, offset):
+        posts = BaiduTiebaPost.query.filter_by(topic_id=topic_id).order_by(BaiduTiebaPost.post_id.desc()).paginate(
+            page=page, per_page=offset, error_out=False).items
+        result = [{
+            "content": post.content, "device": post.public_device,"post_id": post.post_id,
+            "user_id": post.user_id, "floor_id": post.floor_id, "publish_time": post.publish_time
+        } for post in posts]
+        return result
+
+    @classmethod
+    def get_reply_by_posts(cls, post_ids):
+        replys = BaiduTiebaReply.query.filter(BaiduTiebaReply.post_id.in_(post_ids)).all()
+        result = {
+            reply.reply_id: {
+                "content": reply.content,
+                "user_id": reply.user_id,
+                "floor_id": reply.floor_id,
+                "reply_time": reply.reply_time,
+                "post_id": reply.post_id,
+            } for reply in replys
+        }
+        return result
+
+    @classmethod
+    def get_user_info_by_user_ids(cls, user_ids):
+        users = BaiduTiebaUser.query.filter(BaiduTiebaUser.user_id.in_(user_ids)).all()
+        result = {
+            user.user_id: {
+                "user_name": user.user_name,
+                "nickname": user.nickname,
+                "avatar": user.avatar,
+                "user_id": user.user_id,
+            } for user in users
+        }
+        return result

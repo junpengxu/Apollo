@@ -3,7 +3,7 @@
 # @Author  : xu.junpeng
 
 from app.views import Ping, CreateAccount, Login, userInfo, Logout
-from app.views import CreateSpiderTask, SearchSpiderTask, getSpiderTaskResult
+from app.views import CreateSpiderTask, SearchSpiderTask, searchTaskSesult, getTopicDetail
 
 
 def bind_urls(app):
@@ -26,5 +26,9 @@ def bind_urls(app):
         '/spider/create_task', view_func=CreateSpiderTask.as_view('create_spider_task'), methods=['POST'])
     app.add_url_rule(
         '/spider/search_task', view_func=SearchSpiderTask.as_view('search_spider_task'), methods=['POST'])
+
+    ##########
+    # tieba
+    ##########
     app.add_url_rule(
-        '/spider/get_result', view_func=getSpiderTaskResult.as_view('get_spider_task_result'), methods=['POST'])
+        '/spider/search_tieba_task_result', view_func=getTopicDetail.as_view('search_tieba_task_result'),methods=['POST'])

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2020/11/8 12:43 下午
 # @Author  : xu.junpeng
-
+# 目前只能爬纵月六只鹅这个贴吧的数据，因为不同的贴吧，还没有找到通用的能提取数据的方法。大概是反爬措施吧
 import time
 import json
 import datetime
@@ -41,14 +41,16 @@ class Crawl:
         self.request_head.update({"Cookie": cookies})
 
     def process_webpage(self):
-
+        # 还没有找到通用的解析数据的方法， 使用or 拼接发现的格式
         # 1. 获取到当前页面
         soup_html = BeautifulSoup(self.request.get(
             url=self.request_url.format(self.topic_id, self.now_page), headers=self.request_head).content,
                                   features="html.parser")
 
         # 3. 提取出帖子相关的楼层信息，包括这个帖子在当前页面的发布信息，以及回复，以及用户的简要信息
-        page_content = soup_html.find_all('div', attrs={'class': 'l_post l_post_bright j_l_post clearfix'})
+
+        page_content = soup_html.find_all('div', attrs={'class': 'l_post l_post_bright j_l_post clearfix'}) or \
+                       soup_html.find_all('div', attrs={'class': 'l_post j_l_post l_post_bright noborder '})
 
         # 4. 通过回复接口拿到这个页面下所有的回复信息
         comment_info = self.extract_reply(now_page=self.now_page)
@@ -104,7 +106,9 @@ class Crawl:
         return user_info
 
     def extract_post(self, post):
-        post_content = post.find('div', attrs={'class': 'd_post_content j_d_post_content'}).text
+        source  = post.find('div', attrs={'class': 'd_post_content j_d_post_content'}) or \
+                  post.find('div', attrs={'class': 'd_post_content j_d_post_content  clearfix'})
+        post_content = source.text
         post_id = post.attrs["data-pid"]
         floor_tail_info = post.find('div', attrs={'class': "post-tail-wrap"}).find_all('span', attrs={
             'class': 'tail-info'})
@@ -119,7 +123,6 @@ class Crawl:
             "floor_id": floor_id,
             "public_device": public_device,
             "post_id": post_id,
-
         }
         return post_info
 
@@ -137,7 +140,14 @@ class Crawl:
         soup_html = BeautifulSoup(self.request.get(
             url=self.request_url.format(self.topic_id, self.now_page), headers=self.request_head).content,
                                   features="html.parser")
-        topic_title = soup_html.find('h3', attrs='core_title_txt pull-left text-overflow').text
+        source = soup_html.find('h3', attrs='core_title_txt pull-left text-overflow') or \
+                 soup_html.find('h3', attrs='core_title_txt pull-left text-overflow vip_red') or \
+                 soup_html.find('h1', attrs='core_title_txt')
+        try:
+            topic_title = source.text
+        except Exception as e:
+            topic_title='uncatch'
+            print("can not found topic title")
         topic_total_page_nums = int(soup_html.find('ul', attrs={'class': 'l_posts_num'})
                                     .find_all('li', attrs={'class': 'l_reply_num'})[0]
                                     .find_all('span')[1].text)

@@ -24,6 +24,7 @@
         <el-button>取消</el-button>
       </el-form-item>
     </el-form>
+
   </div>
 </template>
 <script>
@@ -55,7 +56,6 @@ export default {
     }
   },
   methods: {
-
     submitForm(form) {
       this.$refs[form].validate((valid) => {
         if (valid) {
@@ -72,7 +72,6 @@ export default {
               message: h('i', { style: 'color: teal' }, '爬虫任务创建成功'),
               duration: 8000
             })
-            this.$router.push({ path: '/spider/list', query: {}})
           }).catch(err => {
             console.log(err)
           })

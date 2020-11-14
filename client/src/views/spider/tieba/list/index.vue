@@ -41,7 +41,7 @@
         width="80"
       >
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="handleClick(scope.row)">查看结果</el-button>
+          <el-button type="text" size="small"><router-link :to="`detail?topic_id=`+scope.row.topic_id">查看结果</router-link></el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -56,7 +56,6 @@
         @current-change="handleCurrentChange"
       />
     </div>
-
   </div>
 </template>
 

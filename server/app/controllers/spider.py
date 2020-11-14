@@ -2,7 +2,7 @@
 # @Time    : 2020/10/25 5:20 下午
 # @Author  : xu.junpeng
 
-from app.models import Spider
+from app.models import Spider, BaiduTiebaTopic
 from sqlalchemy import and_
 
 
@@ -34,15 +34,26 @@ class SpiderController:
         _q = and_()
         tasks = Spider.query.filter(_q).order_by(Spider.id.desc()).paginate(
             page=page, per_page=offset, error_out=False).items
+        topic_ids = [task.topic_id for task in tasks]
         total_nums = Spider.query.filter(_q).order_by(Spider.id.desc()).count()
+        topics = BaiduTiebaTopic.query.filter(BaiduTiebaTopic.topic_id.in_(topic_ids)).all()
+        topics = {topic.topic_id: topic for topic in topics}
         for task in tasks:
-            result.append({
-                "id": task.id,
-                "desc": task.desc,
-                "topic_id": task.topic_id,
-                "start_page": task.start_page,
-                "end_page": task.end_page
-            })
+            try:
+                topic = topics[task.topic_id]
+                result.append({
+                    "id": task.id,
+                    "desc": task.desc,
+                    "create_time": task.create_time,
+                    "update_time": task.update_time,
+                    "topic_id": topic.topic_id,
+                    "topic_url": topic.url,
+                    "topic_title": topic.title,
+                    'crawl_page': topic.crawl_page
+                })
+            except Exception as e:
+                print(e)
+
         return {"result": result, "total_nums": total_nums}
 
     @classmethod
