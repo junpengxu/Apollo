@@ -7,18 +7,6 @@
       <el-form-item prop="topic_id" label="贴吧帖子id">
         <el-input v-model.number="form.topic_id" autocomplete="off" />
       </el-form-item>
-      <el-form-item
-        label="开始页码"
-        prop="start_page"
-      >
-        <el-input v-model.number="form.start_page" autocomplete="off" />
-      </el-form-item>
-      <el-form-item
-        label="结束页码"
-        prop="end_page"
-      >
-        <el-input v-model.number="form.end_page" autocomplete="off" />
-      </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="submitForm('form')">创建任务</el-button>
         <el-button>取消</el-button>
@@ -43,14 +31,6 @@ export default {
         topic_id: [
           { required: true, message: '帖子id不能为空' },
           { type: 'number', message: '帖子id必须为数字值' }
-        ],
-        start_page: [
-          { required: true, message: '结束页码不能为空' },
-          { type: 'number', message: '页码必须为数字值' }
-        ],
-        end_page: [
-          { required: true, message: '结束页码不能为空' },
-          { type: 'number', message: '页码必须为数字值' }
         ]
       }
     }
@@ -61,9 +41,7 @@ export default {
         if (valid) {
           const params = {
             'topic_id': this.form.topic_id,
-            'desc': this.form.desc,
-            'start_page': this.form.start_page,
-            'end_page': this.form.end_page
+            'desc': this.form.desc
           }
           createSpiderTask(params).then(response => {
             const h = this.$createElement

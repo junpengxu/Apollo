@@ -18,8 +18,9 @@ class TiebaController:
     def create_post(cls, topic_id, post_id, content, user_id, floor_id, publish_time, public_device):
         try:
             post = BaiduTiebaPost(post_id=post_id,
-                topic_id=topic_id, content=content, user_id=user_id, floor_id=floor_id, publish_time=publish_time,public_device=public_device
-            )
+                                  topic_id=topic_id, content=content, user_id=user_id, floor_id=floor_id,
+                                  publish_time=publish_time, public_device=public_device
+                                  )
             post.save()
         except:
             return False
@@ -28,7 +29,8 @@ class TiebaController:
     def create_reply(cls, content, user_id, floor_id, reply_time, reply_id, post_id):
         try:
             reply = BaiduTiebaReply(
-                user_id=user_id, content=content, floor_id=floor_id, reply_time=reply_time,reply_id=reply_id, post_id=post_id
+                user_id=user_id, content=content, floor_id=floor_id, reply_time=reply_time, reply_id=reply_id,
+                post_id=post_id
             )
             reply.save()
         except:
@@ -38,7 +40,7 @@ class TiebaController:
     def create_topic(cls, topic_id, title, url, crawl_page):
         try:
             topic = BaiduTiebaTopic(
-                 title=title, topic_id=topic_id, crawl_page=crawl_page, url=url
+                title=title, topic_id=topic_id, crawl_page=crawl_page, url=url
             )
             topic.save()
         except:
@@ -47,7 +49,7 @@ class TiebaController:
     @classmethod
     def update_topic_crawl_status(cls, topic_id, crawl_page):
         try:
-            topic = BaiduTiebaTopic.query.filter_by(topic_id=topic_id).first() # 根据unique的限制，应该只能获取出一条数据
+            topic = BaiduTiebaTopic.query.filter_by(topic_id=topic_id).first()  # 根据unique的限制，应该只能获取出一条数据
             topic.crawl_page = crawl_page
             topic.save()
         except:
@@ -58,10 +60,11 @@ class TiebaController:
         posts = BaiduTiebaPost.query.filter_by(topic_id=topic_id).order_by(BaiduTiebaPost.post_id.desc()).paginate(
             page=page, per_page=offset, error_out=False).items
         result = [{
-            "content": post.content, "device": post.public_device,"post_id": post.post_id,
+            "content": post.content, "device": post.public_device, "post_id": post.post_id,
             "user_id": post.user_id, "floor_id": post.floor_id, "publish_time": post.publish_time
         } for post in posts]
-        return result
+        total_nums = BaiduTiebaPost.query.filter_by(topic_id=topic_id).count()
+        return {"result": result, "total_nums": total_nums}
 
     @classmethod
     def get_reply_by_posts(cls, post_ids):

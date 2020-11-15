@@ -7,7 +7,7 @@ from app.base.baseview import BaseView
 from app.base.status_code import Codes
 
 from app.controllers import SpiderController
-from app.task.spider_tasks import run_zongyue_tieba_spider
+from app.tasks.spider_tasks import run_zongyue_tieba_spider
 from app.controllers.tieba import TiebaController
 
 
@@ -58,7 +58,7 @@ class getTopicDetail(BaseView):
         offset = int(params.get("offset", 20))
         topic_id = params.get("topic_id")
         # 直接组装好数据
-        posts = TiebaController.get_posts_by_topic_id(topic_id, page, offset)
+        posts, total_nums = TiebaController.get_posts_by_topic_id(topic_id, page, offset).values()
         post_ids = [post["post_id"] for post in posts]
         replys = TiebaController.get_reply_by_posts(post_ids)
         user_ids = [reply["user_id"] for reply in replys.values()]
@@ -67,5 +67,5 @@ class getTopicDetail(BaseView):
             "post_info": posts,
             "user_info": users,
             "reply_info": replys,
-            "total_nums": len(posts)
+            "total_nums": total_nums
         })
