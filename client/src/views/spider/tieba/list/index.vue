@@ -13,11 +13,6 @@
         label="任务描述"
       />
       <el-table-column
-        prop="topic_id"
-        label="帖子id"
-        width="120"
-      />
-      <el-table-column
         prop="topic_title"
         label="帖子标题"
       />
@@ -26,7 +21,7 @@
       >
         <template slot-scope="scope">
           <a :href="scope.row.topic_url" target="_blank">
-            <el-link type="primary" target="_blank">{{ scope.row.topic_url }}</el-link>
+            <el-link type="primary" target="_blank">点击跳转</el-link>
           </a>
         </template>
       </el-table-column>
@@ -34,6 +29,10 @@
         prop="crawl_page"
         label="最新页码"
         width="80"
+      />
+      <el-table-column
+        prop="update_time"
+        label="最新爬取时间"
       />
       <el-table-column
         fixed="right"

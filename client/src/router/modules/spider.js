@@ -32,6 +32,7 @@ const spiderRouter =
         },
         {
           path: 'detail',
+          hidden: true,
           component: () => import('@/views/spider/tieba/detail/index'),
           name: '任务详情页',
           meta: { title: '任务详情页', icon: 'documentation' }

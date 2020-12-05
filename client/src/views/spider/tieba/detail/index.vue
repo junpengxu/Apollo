@@ -4,23 +4,41 @@
       :data="tableData"
     >
       <el-table-column
-        prop="post_id"
-        label="帖子id"
-        width="160"
-      />
-      <el-table-column
         prop="content"
         label="帖子内容"
       />
       <el-table-column
-        prop="user_id"
         label="发帖用户"
-        width="160"
+        prop="nickname"
+        width="100"
       />
+      <el-table-column
+        label="用户头像"
+        width="100"
+      >
+        <template slot-scope="scope">
+          <el-image :src="scope.row.avatar" />
+        </template>
+      </el-table-column>
       <el-table-column
         prop="publish_time"
         label="发帖时间"
         width="260"
+      />
+      <el-table-column
+        label="跳转到贴吧页面"
+        width="180"
+      >
+        <template slot-scope="scope">
+          <a :href="scope.row.topic_url" target="_blank">
+            <el-link type="primary" target="_blank">点击跳转</el-link>
+          </a>
+        </template>
+      </el-table-column>
+      <el-table-column
+        prop="page"
+        label="所处页号"
+        width="80"
       />
       <el-table-column
         prop="floor_id"
