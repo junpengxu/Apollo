@@ -35,13 +35,13 @@ class QueryWithSoftDelete(BaseQuery):
         return obj if obj is None or self._with_deleted or not obj.is_delete else None
 
 
-db = SQLAlchemy(use_native_unicode='utf8', query_class=QueryWithSoftDelete)
+db = SQLAlchemy(use_native_unicode='utf8mb4', query_class=QueryWithSoftDelete)
 
 
 class BaseModel(object):
     __table_args__ = {
         'mysql_engine': 'InnoDB',
-        'mysql_charset': 'utf8'
+        'mysql_charset': 'utf8mb4'
     }
 
     create_time = db.Column(db.DateTime, default=datetime.now)

@@ -10,6 +10,8 @@ import datetime
 import requests
 from bs4 import BeautifulSoup
 from app.controllers.tieba import TiebaController
+from app.utils.logger import spider_log
+
 
 # chrome_options = Options()
 
@@ -56,25 +58,25 @@ class Crawl:
 
         # 3. 提取出帖子相关的楼层信息，包括这个帖子在当前页面的发布信息，以及回复，以及用户的简要信息
 
-        page_content = soup_html.find_all('div', attrs={'class': 'l_post l_post_bright j_l_post clearfix'}) or \
-                       soup_html.find_all('div', attrs={'class': 'l_post j_l_post l_post_bright noborder '})
+        page_content = soup_html.find_all('div', attrs={'class': 'l_post l_post_bright j_l_post clearfix'})
 
         # 4. 通过回复接口拿到这个页面下所有的回复信息
         comment_info = self.extract_reply(now_page=self.now_page)
+        # 没有数据的情况下，转换为空字典
+        if comment_info == []:
+            comment_info = {}
 
         # 5. 遍历当前页面下每一个post
         for floor in page_content:
             # 获取这一层的用户信息
             floor_user_info = self.extract_user_info(floor)
             floor_user_id = floor_user_info["user_id"]
-
             self.save_user(
                 user_id=floor_user_id,
                 user_name=floor_user_info["user_name"],
                 avatar=floor_user_info["avatar"],
                 nickname=floor_user_info["user_nickname"]
             )
-
             # 获取post(层)的信息
             post_info = self.extract_post(floor)
             self.save_post(
@@ -97,13 +99,13 @@ class Crawl:
     def extract_user_info(self, floor):
         user_info = json.loads(floor.attrs["data-field"])["author"]
         user_id = user_info["user_id"]  # 本层发帖用户id
-        user_name = user_info["user_name"]
-        user_nickname = user_info["user_nickname"]
+        user_name = user_info.get("user_name", "uncatch")
+        user_nickname = user_info.get("user_nickname", "uncatch")
         avatar_attrs = floor.find('a', attrs={'class': 'p_author_face'}).find('img').attrs
         if "data-tb-lazyload" in avatar_attrs:
-            avatar = avatar_attrs["data-tb-lazyload"]
+            avatar = avatar_attrs.get("data-tb-lazyload", "")
         else:
-            avatar = avatar_attrs["src"]
+            avatar = avatar_attrs.get("src", "")
         user_info = {
             "user_id": user_id,
             "user_name": user_name,
@@ -113,8 +115,7 @@ class Crawl:
         return user_info
 
     def extract_post(self, post):
-        source = post.find('div', attrs={'class': 'd_post_content j_d_post_content'}) or \
-                 post.find('div', attrs={'class': 'd_post_content j_d_post_content  clearfix'})
+        source = post.find('div', attrs={'class': 'd_post_content j_d_post_content'})
         post_content = source.text
         post_id = post.attrs["data-pid"]
         floor_tail_info = post.find('div', attrs={'class': "post-tail-wrap"}).find_all('span', attrs={
@@ -147,18 +148,18 @@ class Crawl:
         soup_html = BeautifulSoup(self.request.get(
             url=self.request_url.format(self.topic_id, self.now_page)).content,
                                   features="html.parser")
+        # 会员发的帖子需要在属性上增加 vip_red
         source = soup_html.find('h3', attrs='core_title_txt pull-left text-overflow') or \
-                 soup_html.find('h3', attrs='core_title_txt pull-left text-overflow vip_red') or \
-                 soup_html.find('h1', attrs='core_title_txt')
+                 soup_html.find('h3', attrs='core_title_txt pull-left text-overflow vip_red')
         try:
-            topic_title = source.text
+            topic_title = source.attrs['title']
         except Exception as e:
             topic_title = 'uncatch'
-            print("can not found topic title")
+            spider_log.info("start crawl tieba topic:{}, title content uncatch".format(self.topic_id))
+
         topic_total_page_nums = int(soup_html.find('ul', attrs={'class': 'l_posts_num'})
                                     .find_all('li', attrs={'class': 'l_reply_num'})[0]
                                     .find_all('span')[1].text)
-
         self.topic_title = topic_title
         self.topic_total_page_nums = topic_total_page_nums
 
@@ -174,7 +175,7 @@ class Crawl:
         TiebaController.create_post(
             topic_id=topic_id, content=content, user_id=user_id,
             publish_time=publish_time, floor_id=floor_id, post_id=post_id,
-            public_device=public_device
+            public_device=public_device, page=self.now_page
         )
 
     def save_reply(self, content, post_id, user_id, reply_id, reply_time, floor_id):
@@ -187,16 +188,21 @@ class Crawl:
             floor_id=floor_id,
         )
 
-    def save_crawl_topic_status(self):
-        url = self.request_url.format(self.topic_id, self.now_page)
-        TiebaController.create_topic(topic_id=self.topic_id, title=self.topic_title, crawl_page=self.now_page, url=url)
+    def create_crawl_topic_status(self):
+        url = self.request_url.format(self.topic_id, self.now_page)[:-1]  # 不保存页码
+        TiebaController.create_topic_crawl(topic_id=self.topic_id, title=self.topic_title, crawl_page=self.now_page,
+                                           url=url)
 
     def update_topic_crawl_status(self):
-        TiebaController.update_topic_crawl_status(topic_id=self.topic_id, crawl_page=self.now_page)
+        TiebaController.update_topic_crawl(topic_id=self.topic_id, crawl_page=self.now_page)
 
     def run(self):
+
         self.get_topic_info()
-        self.save_crawl_topic_status()
+        self.create_crawl_topic_status()
+        # 检查是否爬取过， 从最新一页开始爬
+        spider_task_info = TiebaController.get_topic_info_by_topic_id(self.topic_id)
+        self.now_page = spider_task_info.get('crawl_page', 1)
         while self.now_page <= self.topic_total_page_nums:
             self.process_webpage()
             self.update_topic_crawl_status()

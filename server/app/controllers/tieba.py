@@ -11,15 +11,15 @@ class TiebaController:
         try:
             user = BaiduTiebaUser(user_id=user_id, user_name=user_name, avatar=avatar, nickname=nickname)
             user.save()
-        except:
+        except Exception as e:
             return False
 
     @classmethod
-    def create_post(cls, topic_id, post_id, content, user_id, floor_id, publish_time, public_device):
+    def create_post(cls, topic_id, post_id, content, user_id, floor_id, publish_time, public_device,page):
         try:
             post = BaiduTiebaPost(post_id=post_id,
                                   topic_id=topic_id, content=content, user_id=user_id, floor_id=floor_id,
-                                  publish_time=publish_time, public_device=public_device
+                                  publish_time=publish_time, public_device=public_device, page=page
                                   )
             post.save()
         except:
@@ -37,7 +37,7 @@ class TiebaController:
             return False
 
     @classmethod
-    def create_topic(cls, topic_id, title, url, crawl_page):
+    def create_topic_crawl(cls, topic_id, title, url, crawl_page):
         try:
             topic = BaiduTiebaTopic(
                 title=title, topic_id=topic_id, crawl_page=crawl_page, url=url
@@ -47,11 +47,11 @@ class TiebaController:
             return False
 
     @classmethod
-    def update_topic_crawl_status(cls, topic_id, crawl_page):
+    def update_topic_crawl(cls, topic_id, crawl_page):
         try:
-            topic = BaiduTiebaTopic.query.filter_by(topic_id=topic_id).first()  # 根据unique的限制，应该只能获取出一条数据
+            topic = BaiduTiebaTopic.query.filter_by(topic_id=topic_id).first()
             topic.crawl_page = crawl_page
-            topic.save()
+            topic.update()
         except:
             return False
 
@@ -61,10 +61,22 @@ class TiebaController:
             page=page, per_page=offset, error_out=False).items
         result = [{
             "content": post.content, "device": post.public_device, "post_id": post.post_id,
-            "user_id": post.user_id, "floor_id": post.floor_id, "publish_time": post.publish_time
+            "user_id": post.user_id, "floor_id": post.floor_id, "publish_time": post.publish_time, "page": post.page
         } for post in posts]
         total_nums = BaiduTiebaPost.query.filter_by(topic_id=topic_id).count()
         return {"result": result, "total_nums": total_nums}
+
+    @classmethod
+    def get_topic_info_by_topic_id(cls, topic_id):
+        topic = BaiduTiebaTopic.query.filter_by(topic_id=topic_id).first()
+        if not topic_id:
+            return {}
+        topic_info = {
+            "topic_url": topic.url,
+            "crawl_page": topic.crawl_page,
+            "update_time": topic.update_time
+        }
+        return topic_info
 
     @classmethod
     def get_reply_by_posts(cls, post_ids):

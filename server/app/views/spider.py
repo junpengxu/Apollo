@@ -2,7 +2,6 @@
 # @Time    : 2020/10/17 1:12 上午
 # @Author  : xu.junpeng
 # @File    : view
-
 from app.base.baseview import BaseView
 from app.base.status_code import Codes
 
@@ -30,24 +29,10 @@ class SearchSpiderTask(BaseView):
         content = params.get("content")
         query = params.get("query", {})
         result, total_nums = SpiderController.search_task(page, offset, content, **query).values()
+        for item in result:
+            item["update_time"] = item["update_time"].strftime("%Y年%m月%d日 %H时%M分%S秒")
         if len(result) == 0:
             return self.formattingData(code=Codes.FAILE.code, msg='未查询到数据', data=None)
-        return self.formattingData(code=Codes.SUCCESS.code, msg='搜索完成', data={"data": result, "total_nums": total_nums})
-
-
-class searchTaskSesult(BaseView):
-    def post(self):
-        params = self.request.json
-        page = int(params.get("page", 1))
-        offset = int(params.get("offset", 20))
-        content = params.get("content")
-        query = params.get("query", {})
-        result, total_nums = SpiderController.search_task(page, offset, content, **query).values()
-        if len(result) == 0:
-            return self.formattingData(code=Codes.FAILE.code, msg='未查询到数据', data=None)
-        for index, item in enumerate(result):
-            result[index]["url"] = item["request_url"]
-            del result[index]["request_url"]
         return self.formattingData(code=Codes.SUCCESS.code, msg='搜索完成', data={"data": result, "total_nums": total_nums})
 
 
@@ -59,10 +44,16 @@ class getTopicDetail(BaseView):
         topic_id = params.get("topic_id")
         # 直接组装好数据
         posts, total_nums = TiebaController.get_posts_by_topic_id(topic_id, page, offset).values()
+        topic_info = TiebaController.get_topic_info_by_topic_id(topic_id)
         post_ids = [post["post_id"] for post in posts]
         replys = TiebaController.get_reply_by_posts(post_ids)
-        user_ids = [reply["user_id"] for reply in replys.values()]
+        user_ids = [post["user_id"] for post in posts]
         users = TiebaController.get_user_info_by_user_ids(user_ids)
+        for item in posts:
+            item["nickname"] = users[item["user_id"]]["nickname"] or users[item["user_id"]]["user_name"]
+            item["avatar"] = users[item["user_id"]]["avatar"]
+            item["publish_time"] = item["publish_time"].strftime("%Y年%m月%d日 %H时%M分%S秒")
+            item["topic_url"] = topic_info["topic_url"] + str(item["page"])
         return self.formattingData(code=Codes.SUCCESS.code, msg='搜索完成', data={
             "post_info": posts,
             "user_info": users,

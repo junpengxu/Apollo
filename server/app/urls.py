@@ -3,7 +3,7 @@
 # @Author  : xu.junpeng
 
 from app.views import Ping, CreateAccount, Login, userInfo, Logout
-from app.views import CreateSpiderTask, SearchSpiderTask, searchTaskSesult, getTopicDetail
+from app.views import CreateSpiderTask, SearchSpiderTask, getTopicDetail
 
 
 def bind_urls(app):
