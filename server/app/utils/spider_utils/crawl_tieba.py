@@ -5,11 +5,13 @@
 import time
 import json
 import datetime
-from selenium import webdriver
+# from selenium.webdriver.chrome.options import Options
+# from selenium import webdriver
 import requests
 from bs4 import BeautifulSoup
 from app.controllers.tieba import TiebaController
 
+# chrome_options = Options()
 
 class Crawl:
     def __init__(self, topic_id, crawl_interval=0.02):
@@ -27,11 +29,16 @@ class Crawl:
             'Accept-Language': 'zh-CN,zh;q=0.9'
         }
         self.soup_html = None
-        self.driver = webdriver.Chrome()
-        self.driver.get(self.request_url.format(self.topic_id, 1))
-        self.request_cookies = None
-        self.__gene_request_cookies()
-        self.driver.close()
+        # chrome_options = webdriver.ChromeOptions()
+        # chrome_options.add_argument('--headless')
+        # chrome_options.add_argument('--no-sandbox')
+        # chrome_options.add_argument('--disable-gpu')
+        # chrome_options.add_argument('--disable-dev-shm-usage')
+        # self.driver = webdriver.Chrome(chrome_options = chrome_options)
+        # self.driver.get(self.request_url.format(self.topic_id, 1))
+        # self.request_cookies = None
+        # self.__gene_request_cookies()
+        # self.driver.close()
         self.now_page = 1
         self.topic_total_page_nums = 0
 
@@ -44,7 +51,7 @@ class Crawl:
         # 还没有找到通用的解析数据的方法， 使用or 拼接发现的格式
         # 1. 获取到当前页面
         soup_html = BeautifulSoup(self.request.get(
-            url=self.request_url.format(self.topic_id, self.now_page), headers=self.request_head).content,
+            url=self.request_url.format(self.topic_id, self.now_page)).content,
                                   features="html.parser")
 
         # 3. 提取出帖子相关的楼层信息，包括这个帖子在当前页面的发布信息，以及回复，以及用户的简要信息
@@ -106,14 +113,14 @@ class Crawl:
         return user_info
 
     def extract_post(self, post):
-        source  = post.find('div', attrs={'class': 'd_post_content j_d_post_content'}) or \
-                  post.find('div', attrs={'class': 'd_post_content j_d_post_content  clearfix'})
+        source = post.find('div', attrs={'class': 'd_post_content j_d_post_content'}) or \
+                 post.find('div', attrs={'class': 'd_post_content j_d_post_content  clearfix'})
         post_content = source.text
         post_id = post.attrs["data-pid"]
         floor_tail_info = post.find('div', attrs={'class': "post-tail-wrap"}).find_all('span', attrs={
             'class': 'tail-info'})
         public_device = ''
-        floor_id = floor_tail_info[-2].text  # 所处在的楼层
+        floor_id = floor_tail_info[-2].text[:-1]  # 所处在的楼层
         publish_time = floor_tail_info[-1].text
         if len(floor_tail_info) == 3:
             public_device = floor_tail_info[0].text
@@ -138,7 +145,7 @@ class Crawl:
 
     def get_topic_info(self):
         soup_html = BeautifulSoup(self.request.get(
-            url=self.request_url.format(self.topic_id, self.now_page), headers=self.request_head).content,
+            url=self.request_url.format(self.topic_id, self.now_page)).content,
                                   features="html.parser")
         source = soup_html.find('h3', attrs='core_title_txt pull-left text-overflow') or \
                  soup_html.find('h3', attrs='core_title_txt pull-left text-overflow vip_red') or \
@@ -146,7 +153,7 @@ class Crawl:
         try:
             topic_title = source.text
         except Exception as e:
-            topic_title='uncatch'
+            topic_title = 'uncatch'
             print("can not found topic title")
         topic_total_page_nums = int(soup_html.find('ul', attrs={'class': 'l_posts_num'})
                                     .find_all('li', attrs={'class': 'l_reply_num'})[0]
