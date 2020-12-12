@@ -9,7 +9,7 @@
       />
       <el-table-column
         label="发帖用户"
-        width="200"
+        width="100"
       >
         <template v-slot="scope">
           {{ scope._self.userInfo[scope.row.user_id]["nickname"] || scope._self.userInfo[scope.row.user_id]["user_name"]
@@ -18,7 +18,7 @@
       </el-table-column>
       <el-table-column
         label="用户头像"
-        width="100"
+        width="80"
       >
         <template v-slot="scope">
           <el-image :src="scope.row.avatar" />
@@ -27,11 +27,11 @@
       <el-table-column
         prop="publish_time"
         label="发帖时间"
-        width="260"
+        width="240"
       />
       <el-table-column
-        label="跳转到贴吧页面"
-        width="180"
+        label="贴吧页面"
+        width="100"
       >
         <template v-slot="scope">
           <a :href="scope.row.topic_url" target="_blank">
@@ -41,7 +41,7 @@
       </el-table-column>
       <el-table-column
         prop="page"
-        label="所处页号"
+        label="页号"
         width="80"
       />
       <el-table-column
@@ -52,7 +52,7 @@
       <el-table-column
         type="expand"
         label="展开回复"
-        width="180"
+        width="100"
       >
         <template v-slot="scope" v-bind="replyInfo">
           <el-table :data="replyInfo[scope.row.post_id]">
