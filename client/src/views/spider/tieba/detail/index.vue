@@ -11,15 +11,16 @@
         label="发帖用户"
         width="200"
       >
-        <template slot-scope="scope">
-          {{ scope._self.userInfo[scope.row.user_id]["nickname"] || scope._self.userInfo[scope.row.user_id]["user_name"] }}
+        <template v-slot="scope">
+          {{ scope._self.userInfo[scope.row.user_id]["nickname"] || scope._self.userInfo[scope.row.user_id]["user_name"]
+          }}
         </template>
       </el-table-column>
       <el-table-column
         label="用户头像"
         width="100"
       >
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-image :src="scope.row.avatar" />
         </template>
       </el-table-column>
@@ -32,7 +33,7 @@
         label="跳转到贴吧页面"
         width="180"
       >
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <a :href="scope.row.topic_url" target="_blank">
             <el-link type="primary" target="_blank">点击跳转</el-link>
           </a>
@@ -48,6 +49,41 @@
         label="楼层"
         width="80"
       />
+      <el-table-column
+        type="expand"
+        label="展开回复"
+        width="180"
+      >
+        <template v-slot="scope" v-bind="replyInfo">
+          <el-table :data="replyInfo[scope.row.post_id]">
+            <el-table-column
+              prop="content"
+              label="content"
+            />
+            <el-table-column
+              prop="reply_time"
+              label="回复时间"
+              width="200"
+            />
+            <el-table-column
+              label="用户名"
+              width="100"
+            >
+              <template v-slot="scope">
+                {{ scope._self.userInfo[scope.row.user_id]["nickname"] || scope._self.userInfo[scope.row.user_id]["user_name"] }}
+              </template>
+            </el-table-column>
+            <el-table-column
+              label="用户头像"
+              width="100"
+            >
+              <template v-slot="scope">
+                <el-image :src="scope._self.userInfo[scope.row.user_id]['avatar']" />
+              </template>
+            </el-table-column>
+          </el-table>
+        </template>
+      </el-table-column>
     </el-table>
     <div class="block" style="float: right">
       <el-pagination
