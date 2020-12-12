@@ -46,7 +46,21 @@ class getTopicDetail(BaseView):
         posts, total_nums = TiebaController.get_posts_by_topic_id(topic_id, page, offset).values()
         topic_info = TiebaController.get_topic_info_by_topic_id(topic_id)
         post_ids = [post["post_id"] for post in posts]
+
         replys = TiebaController.get_reply_by_posts(post_ids)
+
+        # format reply data structure
+        reply_data = {}
+        for reply in replys:
+            if reply["post_id"] not in reply_data:
+                reply_data[reply["post_id"]] = []
+            reply_data[reply["post_id"]].append(
+                {
+                    "content": reply["content"],
+                    "user_id": reply["user_id"],
+                    "reply_time": reply["reply_time"].strftime("%Y年%m月%d日 %H时%M分%S秒"),
+                }
+            )
         user_ids = [post["user_id"] for post in posts]
         users = TiebaController.get_user_info_by_user_ids(user_ids)
         for item in posts:
@@ -57,6 +71,6 @@ class getTopicDetail(BaseView):
         return self.formattingData(code=Codes.SUCCESS.code, msg='搜索完成', data={
             "post_info": posts,
             "user_info": users,
-            "reply_info": replys,
+            "reply_info": reply_data,
             "total_nums": total_nums
         })

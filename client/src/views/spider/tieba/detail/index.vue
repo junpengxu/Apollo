@@ -9,9 +9,12 @@
       />
       <el-table-column
         label="发帖用户"
-        prop="nickname"
-        width="100"
-      />
+        width="200"
+      >
+        <template slot-scope="scope">
+          {{ scope._self.userInfo[scope.row.user_id]["nickname"] || scope._self.userInfo[scope.row.user_id]["user_name"] }}
+        </template>
+      </el-table-column>
       <el-table-column
         label="用户头像"
         width="100"
@@ -70,7 +73,9 @@ export default {
       offset: 100,
       totalNum: 1000,
       tableData: [],
-      topic_id: ''
+      topic_id: '',
+      userInfo: {},
+      replyInfo: {}
     }
   },
   created() {
@@ -92,6 +97,8 @@ export default {
           duration: 1000
         })
         this.tableData = response.data['post_info']
+        this.userInfo = response.data['user_info']
+        this.replyInfo = response.data['reply_info']
         this.totalNum = response.data['total_nums']
       }).catch(err => {
         console.log(err)

@@ -81,15 +81,13 @@ class TiebaController:
     @classmethod
     def get_reply_by_posts(cls, post_ids):
         replys = BaiduTiebaReply.query.filter(BaiduTiebaReply.post_id.in_(post_ids)).all()
-        result = {
-            reply.reply_id: {
-                "content": reply.content,
-                "user_id": reply.user_id,
-                "floor_id": reply.floor_id,
-                "reply_time": reply.reply_time,
-                "post_id": reply.post_id,
-            } for reply in replys
-        }
+        result = [{
+            "content": reply.content,
+            "user_id": reply.user_id,
+            "floor_id": reply.floor_id,
+            "reply_time": reply.reply_time,
+            "post_id": reply.post_id,
+        } for reply in replys]
         return result
 
     @classmethod
