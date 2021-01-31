@@ -5,3 +5,4 @@
 from .ping import *
 from .user import *
 from .spider import *
+from .tieba import *

@@ -5,3 +5,4 @@
 from .user import UserController
 from .spider import SpiderController
 from .ping import PingController
+from .tieba import TiebaController

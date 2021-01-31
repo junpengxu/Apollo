@@ -2,7 +2,7 @@
 # @Time    : 2020/11/8 12:27 下午
 # @Author  : xu.junpeng
 from app.models.tieba import BaiduTiebaReply, BaiduTiebaPost, BaiduTiebaUser, BaiduTiebaTopic
-
+from sqlalchemy import and_,or_,not_
 
 class TiebaController:
 
@@ -102,3 +102,22 @@ class TiebaController:
             } for user in users
         }
         return result
+
+    @classmethod
+    def search_post_from_topic(cls, content=None, topic_id=None, page=1, offset=20):
+        if not topic_id:
+            return {"result": [], "total_nums": 0}
+        if content:
+            _query = and_(BaiduTiebaPost.content.like('%{}%'.format(content)), BaiduTiebaPost.topic_id == topic_id)
+        else:
+            _query = and_(BaiduTiebaPost.topic_id == topic_id)
+
+        posts = BaiduTiebaPost.query.filter(_query).order_by(BaiduTiebaPost.post_id.desc()).paginate(
+            page=page, per_page=offset, error_out=False).items
+        result = [{
+            "content": post.content, "device": post.public_device, "post_id": post.post_id,
+            "user_id": post.user_id, "floor_id": post.floor_id, "publish_time": post.publish_time, "page": post.page
+        } for post in posts]
+        total_nums = BaiduTiebaPost.query.filter_by(topic_id=topic_id).count()
+        return {"result": result, "total_nums": total_nums}
+

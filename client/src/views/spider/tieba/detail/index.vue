@@ -1,5 +1,9 @@
 <template>
   <div class="app-container">
+    <div>
+      <el-input v-model="content" style="width: 60%" placeholder="根据帖子内容搜索" />
+      <el-button style="margin-left: 20px" type="primary" @click="filter">提交</el-button>
+    </div>
     <el-table
       :data="tableData"
     >
@@ -111,7 +115,8 @@ export default {
       tableData: [],
       topic_id: '',
       userInfo: {},
-      replyInfo: {}
+      replyInfo: {},
+      content: ''
     }
   },
   created() {
@@ -123,7 +128,8 @@ export default {
       const params = {
         topic_id: this.topic_id,
         page: this.page,
-        offset: this.offset
+        offset: this.offset,
+        content: this.content
       }
       searchTiebaTaskSesult(params).then(response => {
         const h = this.$createElement

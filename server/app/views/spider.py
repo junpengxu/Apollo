@@ -36,14 +36,17 @@ class SearchSpiderTask(BaseView):
         return self.formattingData(code=Codes.SUCCESS.code, msg='搜索完成', data={"data": result, "total_nums": total_nums})
 
 
-class getTopicDetail(BaseView):
+class GetTopicDetail(BaseView):
     def post(self):
         params = self.request.json
         page = int(params.get("page", 1))
         offset = int(params.get("offset", 20))
         topic_id = params.get("topic_id")
+        content = params.get("content")
         # 直接组装好数据
-        posts, total_nums = TiebaController.get_posts_by_topic_id(topic_id, page, offset).values()
+        posts, total_nums = TiebaController.search_post_from_topic(
+            topic_id=topic_id, content=content, page=page, offset=offset
+        ).values()
         topic_info = TiebaController.get_topic_info_by_topic_id(topic_id)
         post_ids = [post["post_id"] for post in posts]
 

@@ -35,7 +35,7 @@ class Logout(BaseView):
         return self.formattingData(code=Codes.SUCCESS.code, msg='退出登陆', data=None)
 
 
-class userInfo(BaseView):
+class UserInfo(BaseView):
     def get(self):
         return self.formattingData(code=Codes.SUCCESS.code, msg='获取用户信息', data={
             "roles": ['admins'],
