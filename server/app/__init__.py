@@ -3,15 +3,25 @@
 # @Author  : xu.junpeng
 import os
 from flask import Flask
+import redis
+from celery import Celery
 from app.base.basemodel import db
 
-from celery import Celery
+import sentry_sdk
+from sentry_sdk.integrations.flask import FlaskIntegration
 
+from app import app_config
+
+sentry_sdk.init(
+    dsn="http://7c508a7e6095471f92ebdc29da48d36d@localhost:9000/1",
+    integrations=[FlaskIntegration()]
+)
 app = Flask(__name__)
 
 app.secret_key = os.urandom(24)
 app.config.from_object("config")
 db.init_app(app)
+
 
 def make_celery(app):
     celery = Celery(
@@ -29,7 +39,12 @@ def make_celery(app):
     celery.Task = ContextTask
     return celery
 
+
 celery = make_celery(app)
+
+redis_cli = {
+    "token": redis.StrictRedis(host=app_config.REDIS_HOST, port=app_config.REDIS_PORT, db=app_config.REDIS_TOEKN_DB)
+}
 
 
 def create_app():
