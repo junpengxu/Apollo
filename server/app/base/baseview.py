@@ -8,7 +8,7 @@ from app import redis_cli
 from app.base.status_code import Codes
 import json
 from app import app_config
-from app.utils.operate_info import record_opterate_log
+from app.tasks.operate_info import record_opterate_log
 
 
 class BaseView(MethodView):
