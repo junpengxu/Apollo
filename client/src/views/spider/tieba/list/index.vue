@@ -81,13 +81,13 @@ export default {
       }
       searchSpiderTask(params).then(response => {
         const h = this.$createElement
+        this.tableData = response.data.data
+        this.totalNum = response.data['total_nums']
         this.$notify({
           title: '搜索成功',
           message: h('i', { style: 'color: teal' }, '搜索成功'),
           duration: 1000
         })
-        this.tableData = response.data.data
-        this.totalNum = response.data['total_nums']
       }).catch(err => {
         console.log(err)
       })
