@@ -7,15 +7,15 @@ import redis
 from celery import Celery
 from app.base.basemodel import db
 
-import sentry_sdk
-from sentry_sdk.integrations.flask import FlaskIntegration
+# import sentry_sdk
+# from sentry_sdk.integrations.flask import FlaskIntegration
 
 from app import app_config
 
-sentry_sdk.init(
-    dsn="http://7c508a7e6095471f92ebdc29da48d36d@localhost:9000/1",
-    integrations=[FlaskIntegration()]
-)
+# sentry_sdk.init(
+#     dsn="http://7c508a7e6095471f92ebdc29da48d36d@localhost:9000/1",
+#     integrations=[FlaskIntegration()]
+# )
 app = Flask(__name__)
 
 app.secret_key = os.urandom(24)
