@@ -30,8 +30,9 @@ class BaseView(MethodView):
         if self.request.url_rule.rule not in app_config.WHITE_LIST:
             token = self.request.cookies.get("Token")
             if token:
-                user_info = json.loads(redis_cli["token"].get(name=token))
+                user_info = redis_cli["token"].get(name=token)
                 if user_info:
+                    user_info = json.loads(user_info)
                     executor = user_info["username"]
                 else:
                     return self.formattingData(code=Codes.TOKEN_INVALID.code, msg=Codes.TOKEN_INVALID.desc, data=None)
