@@ -39,7 +39,7 @@ class BaseView(MethodView):
                 return self.formattingData(code=Codes.TOKEN_INVALID.code, msg=Codes.TOKEN_INVALID.desc, data=None)
         record_opterate_log.delay(
             executor=executor,
-            remote_ip=self.request.remote_addr,
+            remote_ip=self.request.headers.get("X-Real-IP"),
             params=json.dumps(self.request.json),
             router=self.request.url_rule.rule,
             action=self.request.url_rule.endpoint
