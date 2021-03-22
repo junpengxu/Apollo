@@ -35,7 +35,7 @@ class SpiderController:
         tasks = Spider.query.filter(_q).order_by(Spider.id.desc()).paginate(
             page=page, per_page=offset, error_out=False).items
         topic_ids = [task.topic_id for task in tasks]
-        total_nums = Spider.query.filter(_q).order_by(Spider.id.desc()).count()
+        total_nums = Spider.query.filter(_q).count()
         topics = BaiduTiebaTopic.query.filter(BaiduTiebaTopic.topic_id.in_(topic_ids)).all()
         topics = {topic.topic_id: topic for topic in topics}
         for task in tasks:

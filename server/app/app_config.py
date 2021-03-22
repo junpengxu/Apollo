@@ -13,5 +13,5 @@ USER_TOKEN_EXPIRE_TIME = 24 * 60 * 60
 
 WHITE_LIST = [
     '/user/login',
-    '/user/info'
+    '/user/info',
 ]

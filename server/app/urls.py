@@ -4,6 +4,7 @@
 
 from app.views import Ping, CreateAccount, Login, UserInfo, Logout
 from app.views import CreateSpiderTask, SearchSpiderTask, GetTopicDetail, SearchPostFromTopic
+from app.views.operate_log import OperateLog
 
 
 def bind_urls(app):
@@ -35,4 +36,12 @@ def bind_urls(app):
         '/spider/search_tieba_task_result',
         view_func=GetTopicDetail.as_view('search_tieba_task_result'),
         methods=['POST']
+    )
+
+    ##########
+    # operate log
+    ##########
+
+    app.add_url_rule(
+        '/operate_log/search', view_func=OperateLog.as_view('operate_log_search'), methods=['POST']
     )
