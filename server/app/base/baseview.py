@@ -20,7 +20,7 @@ class BaseView(MethodView):
         return jsonify(
             {
                 "code": code,
-                "msg": msg,
+                "message": msg,
                 "data": data
             }
         )

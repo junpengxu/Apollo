@@ -32,8 +32,8 @@ class OperateLogController:
                 "action": log_info.action,
                 "remote_ip": log_info.remote_ip,
                 "router": log_info.router,
-                "router": log_info.create_time,
-                "params": json.loads(log_info.params),
+                "create_time": log_info.create_time.strftime("%Y年%m月%d日 %H时%M分%S秒"),
+                "params": log_info.params,
             })
         res = {"result": result, "total_nums": total_nums}
         return res

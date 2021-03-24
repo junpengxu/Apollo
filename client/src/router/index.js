@@ -100,7 +100,21 @@ export const constantRoutes = [
  */
 
 export const asyncRoutes = [
-  spiderRouter
+  spiderRouter,
+
+  {
+    path: '/operate-log',
+    component: Layout,
+    redirect: '/operate-log/index',
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/operate-log/index'),
+        name: 'operate-log',
+        meta: { title: 'operate-log', icon: 'documentation' }
+      }
+    ]
+  }
 ]
 const createRouter = () => new Router({
   // mode: 'history', // require service support
