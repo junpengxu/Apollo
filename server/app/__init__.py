@@ -2,11 +2,15 @@
 # @Time    : 2020/10/17 1:00 上午
 # @Author  : xu.junpeng
 import os
+import socket
+import time
+from threading import Thread
 from flask import Flask
 import redis
 from celery import Celery
 from app.base.basemodel import db
-
+from app.utils.service_manager import ServiceRegisterManager
+import config
 # import sentry_sdk
 # from sentry_sdk.integrations.flask import FlaskIntegration
 
@@ -48,7 +52,22 @@ redis_cli = {
 }
 
 
+def register_server():
+    while True:
+        server_info = {
+            "node_name": app.config["SERVER_NAME"],
+            "node_host": socket.gethostbyname(socket.gethostname()),
+            "node_port": app.config["SERVER_PORT"],
+            "node_registe_time": time.time()
+        }
+        time.sleep(5)
+        server_register = ServiceRegisterManager()
+        server_register.service_register(server_info)
+
+
 def create_app():
+    print("执行注册")
+    Thread(target=register_server).run()
     from app.urls import bind_urls
     bind_urls(app)
     return app
