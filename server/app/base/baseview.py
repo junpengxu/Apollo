@@ -27,7 +27,7 @@ class BaseView(MethodView):
 
     def dispatch_request(self, *args, **kwargs):
         executor = "unknown"
-        if self.request.url_rule.rule in app_config.WHITE_LIST:
+        if self.request.url_rule.rule not in app_config.WHITE_LIST:
             token = self.request.cookies.get("Token")
             if token:
                 user_info = redis_cli["token"].get(name=token)

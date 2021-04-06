@@ -60,7 +60,7 @@ def register_server():
             "node_port": app.config["SERVER_PORT"],
             "node_register_time": time.time()
         }
-        time.sleep(10)
+        time.sleep(30)
         server_register = ServiceManager()
         server_register.service_register(server_info)
 
