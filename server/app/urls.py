@@ -3,9 +3,9 @@
 # @Author  : xu.junpeng
 
 from app.views import Ping, CreateAccount, Login, UserInfo, Logout
-from app.views import CreateSpiderTask, SearchSpiderTask, GetTopicDetail, SearchPostFromTopic
+from app.views import CreateSpiderTask, SearchSpiderTask, GetTopicDetail
 from app.views.operate_log import OperateLog
-
+from app.views.service_manage import RegisterServiceNode, GetAllService, DestroyService
 
 def bind_urls(app):
     ##########
@@ -44,4 +44,18 @@ def bind_urls(app):
 
     app.add_url_rule(
         '/operate_log/search', view_func=OperateLog.as_view('operate_log_search'), methods=['POST']
+    )
+
+    ##########
+    # service register manager
+    ##########
+
+    app.add_url_rule(
+        '/service_manage/register_service', view_func=RegisterServiceNode.as_view('register_service'), methods=['POST']
+    )
+    app.add_url_rule(
+        '/service_manage/get_all_service', view_func=GetAllService.as_view('get_all_service'), methods=['POST']
+    )
+    app.add_url_rule(
+        '/service_manage/register_service', view_func=DestroyService.as_view('destroy_service'), methods=['POST']
     )

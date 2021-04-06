@@ -4,7 +4,7 @@
 
 # server info
 SERVER_PORT = 8000
-SERVER_NAME = "weakee_server"
+REGISTER_SERVER_NAME = "weakee_server"
 
 
 DB_URI = 'mysql+pymysql://root:123456@localhost:13306/weakee'

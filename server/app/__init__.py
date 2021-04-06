@@ -9,7 +9,7 @@ from flask import Flask
 import redis
 from celery import Celery
 from app.base.basemodel import db
-from app.utils.service_manager import ServiceRegisterManager
+from app.utils.service_manager import ServiceManager
 import config
 # import sentry_sdk
 # from sentry_sdk.integrations.flask import FlaskIntegration
@@ -55,19 +55,18 @@ redis_cli = {
 def register_server():
     while True:
         server_info = {
-            "node_name": app.config["SERVER_NAME"],
+            "node_name": app.config["REGISTER_SERVER_NAME"],
             "node_host": socket.gethostbyname(socket.gethostname()),
             "node_port": app.config["SERVER_PORT"],
-            "node_registe_time": time.time()
+            "node_register_time": time.time()
         }
-        time.sleep(5)
-        server_register = ServiceRegisterManager()
+        time.sleep(10)
+        server_register = ServiceManager()
         server_register.service_register(server_info)
 
 
 def create_app():
-    print("执行注册")
-    Thread(target=register_server).run()
+    Thread(target=register_server).start()
     from app.urls import bind_urls
     bind_urls(app)
     return app

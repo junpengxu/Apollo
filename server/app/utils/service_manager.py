@@ -3,6 +3,8 @@ import time
 from random import choice
 from redis import StrictRedis
 
+from app.utils.Singleton import singleton
+
 
 class NoValidNodeError(OSError):
     pass
@@ -12,7 +14,8 @@ class NodeExistError(OSError):
     pass
 
 
-class ServiceRegisterManager:
+@singleton
+class ServiceManager:
     def __init__(self, host="localhost", post=3367, db=0):
         self.cli = StrictRedis(decode_responses=True)
         self.__node_keys = "services_registe_keys"
@@ -74,9 +77,14 @@ class ServiceRegisterManager:
                 self.cli.hset(name=node_name, key=key, value=val)
             self.__release_lock()
 
-    def __remove_service_node(self, node_info):
-        self.cli.srem(self.__node_keys, node_info["node_name"])
-        self.cli.hdel(node_info["node_name"], *node_info.keys())
+    def __remove_service_node(self, node_name):
+        try:
+            self.cli.srem(self.__node_keys, node_name)
+            self.cli.delete(node_name)
+            return True
+        except Exception as e:
+            print("删除节点失败", e)
+            return False
 
     def __get_all_node_keys(self):
         return self.cli.smembers(self.__node_keys) or []
@@ -90,7 +98,7 @@ class ServiceRegisterManager:
         :param node_info:
         :return: True: 过期, False: 未过期
         """
-        if time.time() - float(node_info["node_registe_time"]) > self.__node_alive_time:
+        if time.time() - float(node_info["node_register_time"]) > self.__node_alive_time:
             return True
         return False
 
@@ -111,40 +119,53 @@ class ServiceRegisterManager:
 
     def service_register(self, node):
         print("开始注册")
-        self.__add_service_node(node)
+        try:
+            self.__add_service_node(node)
+            return True
+        except Exception as e:
+            print("注册失败")
+            return False
 
-    def service_destory(self):
-        return self.__get_service_node()
+    def service_destroy(self, node_name):
+        return self.__remove_service_node(node_name)
+
+    def get_all_service(self):
+        result = []
+        node_names = self.__get_all_node_keys()
+        for node_name in node_names:
+            result.append(self.__get_node_info_by_node_name(node_name))
+        return result
 
     def exit(self):
         self.cli.flushall()
 
 
 if __name__ == '__main__':
-    sm = ServiceRegisterManager()
+    sm = ServiceManager()
+    sm.get_all_service()
     node1_info = {
         "node_name": "node_name1",
         "node_host": "node_host1",
         "node_port": 80,
-        "node_registe_time": time.time()
+        "node_register_time": time.time()
     }
     node2_info = {
         "node_name": "node_name2",
         "node_host": "node_host2",
         "node_port": 80,
-        "node_registe_time": time.time()
+        "node_register_time": time.time()
     }
     node3_info = {
         "node_name": "node_name3",
         "node_host": "node_host3",
         "node_port": 80,
-        "node_registe_time": time.time()
+        "node_register_time": time.time()
     }
     node4_info = {
         "node_name": "node_name4",
         "node_host": "node_host4",
         "node_port": 80,
-        "node_registe_time": time.time()
+        "node_register_time": time.time()
     }
     sm.service_register(node1_info)
     sm.service_register(node2_info)
@@ -155,7 +176,7 @@ if __name__ == '__main__':
     node3_cnt = 0
     node4_cnt = 0
     for i in range(10000):
-        res = sm.service_destory()
+        res = sm.service_destroy()
         if res["node_host"] == "node_host1":
             node1_cnt += 1
         elif res["node_host"] == "node_host2":
