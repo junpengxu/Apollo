@@ -101,7 +101,6 @@ export const constantRoutes = [
 
 export const asyncRoutes = [
   spiderRouter,
-
   {
     path: '/operate-log',
     component: Layout,
@@ -111,7 +110,31 @@ export const asyncRoutes = [
         path: 'index',
         component: () => import('@/views/operate-log/index'),
         name: 'operate-log',
-        meta: { title: 'operate-log', icon: 'documentation' }
+        meta: { title: '操作日志', icon: 'documentation' }
+      }
+    ]
+  },
+  {
+    path: '/service-manager',
+    component: Layout,
+    redirect: '/service-manager/service-manage/list',
+    name: '服务管理',
+    meta: {
+      title: '服务管理',
+      icon: 'el-icon-s-help'
+    },
+    children: [
+      {
+        path: 'list',
+        component: () => import('@/views/service-manager/service-manage/list'),
+        name: 'config-center',
+        meta: { title: '服务管理', icon: 'documentation' }
+      },
+      {
+        path: 'index',
+        component: () => import('@/views/service-manager/config-center/index'),
+        name: 'config-center',
+        meta: { title: '配置中心', icon: 'documentation' }
       }
     ]
   }

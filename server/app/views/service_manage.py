@@ -9,6 +9,7 @@ from app.utils.service_manager import ServiceManager
 from app import redis_cli
 from app import app_config
 import json
+from datetime import datetime
 
 
 class RegisterServiceNode(BaseView):
@@ -37,9 +38,28 @@ class RegisterServiceNode(BaseView):
 
 class GetAllService(BaseView):
     def post(self):
+        params = self.request.json
+        page = params.get("page", 0)
+        offset = params.get("offset", 20)
         result = ServiceManager().get_all_service()
+        services = result[(page - 1) * offset: page * offset]
+        for node in services:
+            node["node_register_time"] = datetime.fromtimestamp(float(node["node_register_time"])).strftime(
+                "%Y年%m月%d日 %H时%M分%S秒")
+
+        data = {"data": services, "total_nums": len(result)}
         if result:
-            return self.formattingData(code=Codes.SUCCESS.code, msg=Codes.SUCCESS.desc, data=result)
+            return self.formattingData(code=Codes.SUCCESS.code, msg=Codes.SUCCESS.desc, data=data)
+        else:
+            return self.formattingData(code=Codes.NONE_SERVICES.code, msg=Codes.NONE_SERVICES.desc, data=None)
+
+
+class GetService(BaseView):
+    def post(self):
+        result = ServiceManager().get_all_service()
+        data = {"data": result, "total_nums": len(result)}
+        if result:
+            return self.formattingData(code=Codes.SUCCESS.code, msg=Codes.SUCCESS.desc, data=data)
         else:
             return self.formattingData(code=Codes.NONE_SERVICES.code, msg=Codes.NONE_SERVICES.desc, data=None)
 
